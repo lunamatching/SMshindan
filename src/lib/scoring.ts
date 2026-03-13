@@ -33,7 +33,8 @@ export function calculateResult(answers: Answers): DiagnosisResult {
 
   const lfWinner = axisScores.L < axisScores.F ? 'L' : 'F'
   const mbWinner = axisScores.M < axisScores.B ? 'M' : 'B'
-  const dnWinner = axisScores.D < axisScores.N ? 'D' : 'N'
+  // Body タイプに Day バリアントは存在しない（LBDS/LBDP/FBDS/FBDP は無効）ため B+D → B+N に補正
+  const dnWinner = axisScores.D < axisScores.N && mbWinner !== 'B' ? 'D' : 'N'
   const spWinner = axisScores.P < axisScores.S ? 'P' : 'S'
 
   const mainType = `${lfWinner}${mbWinner}${dnWinner}${spWinner}`
@@ -45,11 +46,17 @@ export function calculateResult(answers: Answers): DiagnosisResult {
     SP: Math.abs(axisScores.P - axisScores.S),
   }
 
-  // サブタイプ：最小マージンの軸を反転
-  const minAxis = (Object.entries(axisMargins) as [Axis, number][])
-    .reduce((min, curr) => (curr[1] < min[1] ? curr : min))
-
-  const subType = flipAxis(mainType, minAxis[0], { lfWinner, mbWinner, dnWinner, spWinner })
+  // サブタイプ：マージンが小さい軸から順に反転を試み、有効なタイプが得られた最初のものを採用
+  const sortedAxes = (Object.entries(axisMargins) as [Axis, number][])
+    .sort((a, b) => a[1] - b[1])
+  let subType = mainType
+  for (const [axis] of sortedAxes) {
+    const candidate = flipAxis(mainType, axis, { lfWinner, mbWinner, dnWinner, spWinner })
+    if (isValidTypeCode(candidate)) {
+      subType = candidate
+      break
+    }
+  }
 
   // スイッチャー判定
   const isSwitcher = mainType[0] !== subType[0]

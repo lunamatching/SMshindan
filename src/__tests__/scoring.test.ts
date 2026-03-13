@@ -23,12 +23,13 @@ describe('calculateResult', () => {
     expect(result.mainType[2]).toBe('N')
   })
 
-  test('全問「全く当てはまらない（-2）」→ Lead / Day / Perversion が優勢（逆転判定）', () => {
+  test('全問「全く当てはまらない（-2）」→ Lead / Night / Perversion（Body+Day補正によりNight）', () => {
     const result = calculateResult(allAnswers(-2))
     // LF: L=-6、F=-4 → L<F=true → Lead
     expect(result.mainType[0]).toBe('L')
-    // DN: D=-6、N=-4 → D<N=true → Day
-    expect(result.mainType[2]).toBe('D')
+    // MB: M=-6、B=-6 → M<B=false → Body
+    // DN: D=-6、N=-4 → D<N=true だが Body のため Night に補正
+    expect(result.mainType[2]).toBe('N')
     // SP: P=-8、S=-2 → P<S=true → Perversion
     expect(result.mainType[3]).toBe('P')
   })
