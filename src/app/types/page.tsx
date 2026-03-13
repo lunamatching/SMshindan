@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 function getAxisLabels(code: string) {
   const [lf, mb, dn, sp] = code.split('')
   return [
-    lf === 'L' ? '主導' : '服従',
-    mb === 'M' ? '精神型' : '肉体型',
-    dn === 'D' ? '日常系' : '非日常系',
-    sp === 'S' ? '純粋' : '倒錯',
+    lf === 'L' ? 'Lead' : 'Follow',
+    mb === 'M' ? 'Mental' : 'Body',
+    dn === 'D' ? 'Day' : 'Night',
+    sp === 'S' ? 'Straight' : 'Perversion',
   ]
 }
 
@@ -37,7 +37,7 @@ export default function TypesPage() {
       {/* 主導系タイプ */}
       <section className="space-y-3">
         <div className="flex items-center gap-3">
-          <span className="text-luna-gold text-xs font-mono border border-luna-gold/40 rounded px-2 py-0.5">L｜主導系</span>
+          <span className="text-luna-gold text-xs font-mono border border-luna-gold/40 rounded px-2 py-0.5">L｜Lead</span>
           <p className="text-luna-muted text-xs">関係性でリードする側</p>
         </div>
         <div className="space-y-3">
@@ -77,7 +77,7 @@ export default function TypesPage() {
       {/* 服従系タイプ */}
       <section className="space-y-3">
         <div className="flex items-center gap-3">
-          <span className="text-[#a78bfa] text-xs font-mono border border-[#a78bfa]/40 rounded px-2 py-0.5">F｜服従系</span>
+          <span className="text-[#a78bfa] text-xs font-mono border border-[#a78bfa]/40 rounded px-2 py-0.5">F｜Follow</span>
           <p className="text-luna-muted text-xs">関係性で委ねる側</p>
         </div>
         <div className="space-y-3">

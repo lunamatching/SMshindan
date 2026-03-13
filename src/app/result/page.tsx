@@ -38,10 +38,10 @@ function parseAxisBars(as: string): AxisBar[] | null {
   }
 
   return [
-    { leftLabel: '主導', rightLabel: '服従',  leftPct: leftPct(L, 3, F, 2) },
-    { leftLabel: '精神', rightLabel: '肉体',  leftPct: leftPct(M, 3, B, 3) },
-    { leftLabel: '日常', rightLabel: '非日常', leftPct: leftPct(D, 3, N, 2) },
-    { leftLabel: '純粋', rightLabel: '倒錯',  leftPct: leftPct(S, 1, P, 4) },
+    { leftLabel: 'Lead',      rightLabel: 'Follow',     leftPct: leftPct(L, 3, F, 2) },
+    { leftLabel: 'Mental',    rightLabel: 'Body',       leftPct: leftPct(M, 3, B, 3) },
+    { leftLabel: 'Day',       rightLabel: 'Night',      leftPct: leftPct(D, 3, N, 2) },
+    { leftLabel: 'Straight',  rightLabel: 'Perversion', leftPct: leftPct(S, 1, P, 4) },
   ]
 }
 
