@@ -18,26 +18,19 @@ interface AxisBar {
   leftPct: number  // 0〜100: 左側（主導・精神・日常・純粋）の強さ
 }
 
-// 各方向の問題数: L=3, F=2, M=3, B=3, D=3, N=2, S=1, P=4
-// 正規化して [0,100] にしてから比率を計算することで負の合計を回避
-function normAbs(score: number, count: number): number {
-  return Math.max(0, (score + count * 2) / (count * 4) * 100)
-}
-
+// 各軸の最大差分: LF=(3+2)*2=10, MB=(3+3)*2=12, DN=(3+2)*2=10, SP=(1+4)*2=10
+// 差分を [0,100] にマッピングすることで、常に勝者側が >50% になる
 function parseAxisBars(as: string): AxisBar[] | null {
   if (!as) return null
   const parts = as.split(',').map(Number)
   if (parts.length !== 8 || parts.some(isNaN)) return null
   const [L, F, M, B, D, N, S, P] = parts
 
-  const calcPct = (ls: number, ln: number, rs: number, rn: number) => {
-    const l = normAbs(ls, ln)
-    const r = normAbs(rs, rn)
-    const total = l + r || 1
-    return Math.round((l / total) * 100)
-  }
+  // left側スコア - right側スコア の差を [0,100] に変換
+  const diffPct = (left: number, right: number, maxDiff: number) =>
+    Math.round((left - right + maxDiff) / (maxDiff * 2) * 100)
 
-  // 50% タイ時は勝者側を 51% に補正（中央値で全回答した場合に対応）
+  // 50% タイ時は勝者側を 51% に補正
   const adjustTie = (pct: number, leftWins: boolean) =>
     pct === 50 ? (leftWins ? 51 : 49) : pct
 
@@ -46,13 +39,13 @@ function parseAxisBars(as: string): AxisBar[] | null {
   const dayWouldWin = D > N
   const dnLeftPct = bodyWins && dayWouldWin
     ? 49
-    : adjustTie(calcPct(D, 3, N, 2), D > N && !bodyWins)
+    : adjustTie(diffPct(D, N, 10), D > N && !bodyWins)
 
   return [
-    { leftLabel: 'Lead',      rightLabel: 'Follow',     leftPct: adjustTie(calcPct(L, 3, F, 2), L > F) },
-    { leftLabel: 'Mental',    rightLabel: 'Body',       leftPct: adjustTie(calcPct(M, 3, B, 3), M > B) },
+    { leftLabel: 'Lead',      rightLabel: 'Follow',     leftPct: adjustTie(diffPct(L, F, 10), L > F) },
+    { leftLabel: 'Mental',    rightLabel: 'Body',       leftPct: adjustTie(diffPct(M, B, 12), M > B) },
     { leftLabel: 'Day',       rightLabel: 'Night',      leftPct: dnLeftPct },
-    { leftLabel: 'Straight',  rightLabel: 'Perversion', leftPct: adjustTie(calcPct(S, 1, P, 4), P <= S) },
+    { leftLabel: 'Straight',  rightLabel: 'Perversion', leftPct: adjustTie(diffPct(S, P, 10), P <= S) },
   ]
 }
 
