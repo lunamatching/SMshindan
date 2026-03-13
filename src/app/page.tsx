@@ -11,7 +11,7 @@ export default function StartPage() {
           あなたの真の姿は<br />どれ？
         </h1>
         <p className="text-luna-muted text-sm leading-relaxed">
-          21の設問であなたの深層欲求タイプを解析します
+          29の設問であなたの深層欲求タイプを解析します
         </p>
       </header>
 

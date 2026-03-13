@@ -10,7 +10,11 @@ const ALLOWED_TAGS = new Set(FETISH_TAG_CATEGORIES.flatMap((c) => c.tags))
 
 export async function POST(req: NextRequest) {
   // レートリミット: IPアドレスベースで1時間5回まで
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? req.headers.get('x-real-ip') ?? 'unknown'
+  // x-real-ip はプロキシ（Vercel等）が設定するため信頼できる。
+  // x-forwarded-for は先頭がクライアント制御可能なため最後尾を使用する。
+  const xRealIp = req.headers.get('x-real-ip')
+  const xForwardedFor = req.headers.get('x-forwarded-for')
+  const ip = xRealIp ?? xForwardedFor?.split(',').at(-1)?.trim() ?? 'unknown'
   const { allowed, remaining, resetAt } = checkRateLimit(ip, 'generate-profile')
   if (!allowed) {
     return NextResponse.json(
@@ -75,11 +79,20 @@ ${tags ? `Fetishタグ: ${tags}` : ''}
 
 自己紹介文のみを出力してください（説明や前置き不要）。`
 
-  const message = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 300,
-    messages: [{ role: 'user', content: prompt }],
-  })
+  let message: Awaited<ReturnType<typeof client.messages.create>>
+  try {
+    message = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      messages: [{ role: 'user', content: prompt }],
+    })
+  } catch (err) {
+    console.error('[generate-profile] Anthropic API error:', err)
+    return NextResponse.json(
+      { error: '自己紹介文の生成に失敗しました。しばらく後にお試しください。' },
+      { status: 503 }
+    )
+  }
 
   const textBlock = message.content.find((b) => b.type === 'text')
   if (!textBlock || textBlock.type !== 'text') {

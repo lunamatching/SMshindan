@@ -36,7 +36,9 @@ async function saveEntries(entries: EmailEntry[]): Promise<void> {
 
 export async function POST(req: NextRequest) {
   // レートリミット: IPアドレスベースで1時間10回まで
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? req.headers.get('x-real-ip') ?? 'unknown'
+  const xRealIp = req.headers.get('x-real-ip')
+  const xForwardedFor = req.headers.get('x-forwarded-for')
+  const ip = xRealIp ?? xForwardedFor?.split(',').at(-1)?.trim() ?? 'unknown'
   const { allowed, resetAt } = checkRateLimit(ip, 'save-email')
   if (!allowed) {
     return NextResponse.json(
@@ -87,6 +89,16 @@ export async function POST(req: NextRequest) {
 
   try {
     const entries = await loadEntries()
+
+    // ファイルサイズ上限（DoS対策）
+    const MAX_ENTRIES = 10_000
+    if (entries.length >= MAX_ENTRIES) {
+      console.error('[save-email] entries limit reached:', entries.length)
+      return NextResponse.json(
+        { error: '現在登録を受け付けられません。しばらく後にお試しください。' },
+        { status: 503 }
+      )
+    }
 
     // 重複チェック（同一メール + 同一タイプ）
     const isDuplicate = entries.some(
