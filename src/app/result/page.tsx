@@ -30,26 +30,29 @@ function parseAxisBars(as: string): AxisBar[] | null {
   if (parts.length !== 8 || parts.some(isNaN)) return null
   const [L, F, M, B, D, N, S, P] = parts
 
-  const leftPct = (ls: number, ln: number, rs: number, rn: number) => {
+  const calcPct = (ls: number, ln: number, rs: number, rn: number) => {
     const l = normAbs(ls, ln)
     const r = normAbs(rs, rn)
     const total = l + r || 1
     return Math.round((l / total) * 100)
   }
 
-  // Body が勝ち（M >= B）かつ生スコアでは Day が優勢（D < N）の場合、
-  // Night 側が僅かに上回るランダム値（Day 44〜49%）を表示する
+  // 50% タイ時は勝者側を 51% に補正（中央値で全回答した場合に対応）
+  const adjustTie = (pct: number, leftWins: boolean) =>
+    pct === 50 ? (leftWins ? 51 : 49) : pct
+
+  // Body が勝ち（M >= B）かつ生スコアでは Day が優勢（D < N）の場合、Day 49% / Night 51% 固定
   const bodyWins = M >= B
   const dayWouldWin = D < N
   const dnLeftPct = bodyWins && dayWouldWin
-    ? 44 + Math.floor(Math.random() * 6)
-    : leftPct(D, 3, N, 2)
+    ? 49
+    : adjustTie(calcPct(D, 3, N, 2), D < N && !bodyWins)
 
   return [
-    { leftLabel: 'Lead',      rightLabel: 'Follow',     leftPct: leftPct(L, 3, F, 2) },
-    { leftLabel: 'Mental',    rightLabel: 'Body',       leftPct: leftPct(M, 3, B, 3) },
+    { leftLabel: 'Lead',      rightLabel: 'Follow',     leftPct: adjustTie(calcPct(L, 3, F, 2), L < F) },
+    { leftLabel: 'Mental',    rightLabel: 'Body',       leftPct: adjustTie(calcPct(M, 3, B, 3), M < B) },
     { leftLabel: 'Day',       rightLabel: 'Night',      leftPct: dnLeftPct },
-    { leftLabel: 'Straight',  rightLabel: 'Perversion', leftPct: leftPct(S, 1, P, 4) },
+    { leftLabel: 'Straight',  rightLabel: 'Perversion', leftPct: adjustTie(calcPct(S, 1, P, 4), P >= S) },
   ]
 }
 
@@ -98,13 +101,6 @@ export default function ResultPage({ searchParams }: Props) {
       {/* メインタイプ */}
       <div className="pt-6 space-y-2">
         <p className="text-luna-gold text-xs tracking-widest text-center uppercase">診断結果</p>
-        {isSwitcher && (
-          <div className="text-center">
-            <span className="inline-block bg-luna-gold/20 border border-luna-gold/40 rounded-full px-4 py-1 text-luna-gold text-xs">
-              ⚡ スイッチャー
-            </span>
-          </div>
-        )}
         <TypeCard type={mainType} variant="main" />
         {/* Fetish タグ（メインタイプ枠と一体化） */}
         {tags.length > 0 && (
@@ -114,13 +110,18 @@ export default function ResultPage({ searchParams }: Props) {
         )}
       </div>
 
-      {/* レアリティ */}
-      <div className="text-center">
+      {/* レアリティ + スイッチャー */}
+      <div className="flex items-center justify-center gap-3 flex-wrap">
         <p className="text-luna-muted text-sm">
           あなたのタイプは全体の
           <span className="text-luna-gold font-bold text-xl mx-1">{rarity}</span>
           ％
         </p>
+        {isSwitcher && (
+          <span className="inline-block bg-luna-gold/20 border border-luna-gold/40 rounded-full px-3 py-0.5 text-luna-gold text-xs">
+            ⚡ スイッチャー
+          </span>
+        )}
       </div>
 
       {/* 四軸スコア */}
