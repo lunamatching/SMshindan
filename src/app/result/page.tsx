@@ -37,10 +37,18 @@ function parseAxisBars(as: string): AxisBar[] | null {
     return Math.round((l / total) * 100)
   }
 
+  // Body が勝ち（M >= B）かつ生スコアでは Day が優勢（D < N）の場合、
+  // Night 側が僅かに上回るランダム値（Day 44〜49%）を表示する
+  const bodyWins = M >= B
+  const dayWouldWin = D < N
+  const dnLeftPct = bodyWins && dayWouldWin
+    ? 44 + Math.floor(Math.random() * 6)
+    : leftPct(D, 3, N, 2)
+
   return [
     { leftLabel: 'Lead',      rightLabel: 'Follow',     leftPct: leftPct(L, 3, F, 2) },
     { leftLabel: 'Mental',    rightLabel: 'Body',       leftPct: leftPct(M, 3, B, 3) },
-    { leftLabel: 'Day',       rightLabel: 'Night',      leftPct: leftPct(D, 3, N, 2) },
+    { leftLabel: 'Day',       rightLabel: 'Night',      leftPct: dnLeftPct },
     { leftLabel: 'Straight',  rightLabel: 'Perversion', leftPct: leftPct(S, 1, P, 4) },
   ]
 }
