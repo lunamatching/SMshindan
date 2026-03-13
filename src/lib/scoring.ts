@@ -1,4 +1,4 @@
-import { allQuestions, type Axis } from '@/data/questions'
+import { allQuestions, type Axis, type Direction } from '@/data/questions'
 import { diagnosisTypes, getTypeByCode } from '@/data/types'
 
 export type Answers = Record<string, number>
@@ -24,10 +24,19 @@ export function calculateResult(answers: Answers): DiagnosisResult {
   const axisScores: AxisScores = { L: 0, F: 0, M: 0, B: 0, D: 0, N: 0, S: 0, P: 0 }
 
   // 軸設問のみ軸スコアに加算
+  // 正の回答 → 指定方向に加算、負の回答 → 反対方向に加算
+  // これにより各軸の両側が同じ最大値を持ち、比較が公平になる
+  const oppositeDir: Record<Direction, Direction> = {
+    L: 'F', F: 'L', M: 'B', B: 'M', D: 'N', N: 'D', S: 'P', P: 'S',
+  }
   for (const question of allQuestions) {
     if (question.kind === 'axis') {
       const score = answers[question.id] ?? 0
-      axisScores[question.direction] += score
+      if (score > 0) {
+        axisScores[question.direction] += score
+      } else if (score < 0) {
+        axisScores[oppositeDir[question.direction]] += Math.abs(score)
+      }
     }
   }
 
