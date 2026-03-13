@@ -32,11 +32,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // App Router はスクリプトを外部バンドルとして配信するため unsafe-inline 不要。
-              // 開発時のみ unsafe-eval（HMR）と unsafe-inline を許可する。
+              // Next.js はハイドレーション用のインラインスクリプトを生成するため unsafe-inline が必要。
+              // 開発時は HMR のため unsafe-eval も追加する。
               process.env.NODE_ENV === 'development'
                 ? "script-src 'self' 'unsafe-eval' 'unsafe-inline'"
-                : "script-src 'self'",
+                : "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",  // Tailwind インラインスタイルのため必要
               "img-src 'self' data: https:",
               "font-src 'self'",
