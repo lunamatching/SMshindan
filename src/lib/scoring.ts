@@ -31,10 +31,10 @@ export function calculateResult(answers: Answers): DiagnosisResult {
     }
   }
 
-  const lfWinner = axisScores.L > axisScores.F ? 'L' : 'F'
-  const mbWinner = axisScores.M > axisScores.B ? 'M' : 'B'
-  const dnWinner = axisScores.D > axisScores.N ? 'D' : 'N'
-  const spWinner = axisScores.P > axisScores.S ? 'P' : 'S'
+  const lfWinner = axisScores.L < axisScores.F ? 'L' : 'F'
+  const mbWinner = axisScores.M < axisScores.B ? 'M' : 'B'
+  const dnWinner = axisScores.D < axisScores.N ? 'D' : 'N'
+  const spWinner = axisScores.P < axisScores.S ? 'P' : 'S'
 
   const mainType = `${lfWinner}${mbWinner}${dnWinner}${spWinner}`
 

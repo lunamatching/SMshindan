@@ -13,21 +13,24 @@ function axisOnlyAnswers(score: number): Answers {
 }
 
 describe('calculateResult', () => {
-  test('全問「とても当てはまる（2）」→ Lead 軸が優勢', () => {
+  test('全問「とても当てはまる（2）」→ Follow 軸が優勢（逆転判定）', () => {
     const result = calculateResult(allAnswers(2))
-    // LF: L方向(LF1,2,3)=6 > F方向(LF4,5)=4 → Lead
-    expect(result.mainType[0]).toBe('L')
-    // SP: P方向(SP1,3,4,5)=8 > S方向(SP2)=2 → Perversion
-    expect(result.mainType[3]).toBe('P')
-    // DN: D方向(DN2,3,4)=6 > N方向(DN1,5)=4 → Day
-    expect(result.mainType[2]).toBe('D')
+    // LF: L方向(LF1,2,3)=6、F方向(LF4,5)=4 → L<F=false → Follow
+    expect(result.mainType[0]).toBe('F')
+    // SP: P方向(SP1,3,4,5)=8、S方向(SP2)=2 → P<S=false → Straight
+    expect(result.mainType[3]).toBe('S')
+    // DN: D方向(DN2,3,4)=6、N方向(DN1,5)=4 → D<N=false → Night
+    expect(result.mainType[2]).toBe('N')
   })
 
-  test('全問「全く当てはまらない（-2）」→ Follow / Night / Straight が優勢', () => {
+  test('全問「全く当てはまらない（-2）」→ Lead / Day / Perversion が優勢（逆転判定）', () => {
     const result = calculateResult(allAnswers(-2))
-    expect(result.mainType[0]).toBe('F')
-    expect(result.mainType[2]).toBe('N')
-    expect(result.mainType[3]).toBe('S')
+    // LF: L=-6、F=-4 → L<F=true → Lead
+    expect(result.mainType[0]).toBe('L')
+    // DN: D=-6、N=-4 → D<N=true → Day
+    expect(result.mainType[2]).toBe('D')
+    // SP: P=-8、S=-2 → P<S=true → Perversion
+    expect(result.mainType[3]).toBe('P')
   })
 
   test('答えなし（空）でも正常に動作する', () => {
