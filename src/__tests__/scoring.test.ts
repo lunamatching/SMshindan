@@ -13,25 +13,24 @@ function axisOnlyAnswers(score: number): Answers {
 }
 
 describe('calculateResult', () => {
-  test('全問「とても当てはまる（2）」→ Follow 軸が優勢（逆転判定）', () => {
+  test('全問「とても当てはまる（2）」→ Lead / Night / Perversion（MBタイ→Body→Night補正）', () => {
     const result = calculateResult(allAnswers(2))
-    // LF: L方向(LF1,2,3)=6、F方向(LF4,5)=4 → L<F=false → Follow
-    expect(result.mainType[0]).toBe('F')
-    // SP: P方向(SP1,3,4,5)=8、S方向(SP2)=2 → P<S=false → Straight
-    expect(result.mainType[3]).toBe('S')
-    // DN: D方向(DN2,3,4)=6、N方向(DN1,5)=4 → D<N=false → Night
+    // LF: L方向(LF1,2,3)=6、F方向(LF4,5)=4 → L>F=true → Lead
+    expect(result.mainType[0]).toBe('L')
+    // SP: P方向(SP1,3,4,5)=8、S方向(SP2)=2 → P>S=true → Perversion
+    expect(result.mainType[3]).toBe('P')
+    // MB: M=6、B=6 → タイ → Body。Body のため Night に補正
     expect(result.mainType[2]).toBe('N')
   })
 
-  test('全問「全く当てはまらない（-2）」→ Lead / Night / Perversion（Body+Day補正によりNight）', () => {
+  test('全問「全く当てはまらない（-2）」→ Follow / Night / Straight', () => {
     const result = calculateResult(allAnswers(-2))
-    // LF: L=-6、F=-4 → L<F=true → Lead
-    expect(result.mainType[0]).toBe('L')
-    // MB: M=-6、B=-6 → M<B=false → Body
-    // DN: D=-6、N=-4 → D<N=true だが Body のため Night に補正
+    // LF: L=-6、F=-4 → L>F=false → Follow
+    expect(result.mainType[0]).toBe('F')
+    // MB: M=-6、B=-6 → タイ → Body → Night に補正
     expect(result.mainType[2]).toBe('N')
-    // SP: P=-8、S=-2 → P<S=true → Perversion
-    expect(result.mainType[3]).toBe('P')
+    // SP: P=-8、S=-2 → P>S=false → Straight
+    expect(result.mainType[3]).toBe('S')
   })
 
   test('答えなし（空）でも正常に動作する', () => {

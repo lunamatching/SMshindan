@@ -31,11 +31,11 @@ export function calculateResult(answers: Answers): DiagnosisResult {
     }
   }
 
-  const lfWinner = axisScores.L < axisScores.F ? 'L' : 'F'
-  const mbWinner = axisScores.M < axisScores.B ? 'M' : 'B'
+  const lfWinner = axisScores.L > axisScores.F ? 'L' : 'F'
+  const mbWinner = axisScores.M > axisScores.B ? 'M' : 'B'
   // Body タイプに Day バリアントは存在しない（LBDS/LBDP/FBDS/FBDP は無効）ため B+D → B+N に補正
-  const dnWinner = axisScores.D < axisScores.N && mbWinner !== 'B' ? 'D' : 'N'
-  const spWinner = axisScores.P < axisScores.S ? 'P' : 'S'
+  const dnWinner = axisScores.D > axisScores.N && mbWinner !== 'B' ? 'D' : 'N'
+  const spWinner = axisScores.P > axisScores.S ? 'P' : 'S'
 
   const mainType = `${lfWinner}${mbWinner}${dnWinner}${spWinner}`
 

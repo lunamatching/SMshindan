@@ -41,18 +41,18 @@ function parseAxisBars(as: string): AxisBar[] | null {
   const adjustTie = (pct: number, leftWins: boolean) =>
     pct === 50 ? (leftWins ? 51 : 49) : pct
 
-  // Body が勝ち（M >= B）かつ生スコアでは Day が優勢（D < N）の場合、Day 49% / Night 51% 固定
-  const bodyWins = M >= B
-  const dayWouldWin = D < N
+  // Body が勝ち（M <= B）かつ生スコアでは Day が優勢（D > N）の場合、Day 49% / Night 51% 固定
+  const bodyWins = M <= B
+  const dayWouldWin = D > N
   const dnLeftPct = bodyWins && dayWouldWin
     ? 49
-    : adjustTie(calcPct(D, 3, N, 2), D < N && !bodyWins)
+    : adjustTie(calcPct(D, 3, N, 2), D > N && !bodyWins)
 
   return [
-    { leftLabel: 'Lead',      rightLabel: 'Follow',     leftPct: adjustTie(calcPct(L, 3, F, 2), L < F) },
-    { leftLabel: 'Mental',    rightLabel: 'Body',       leftPct: adjustTie(calcPct(M, 3, B, 3), M < B) },
+    { leftLabel: 'Lead',      rightLabel: 'Follow',     leftPct: adjustTie(calcPct(L, 3, F, 2), L > F) },
+    { leftLabel: 'Mental',    rightLabel: 'Body',       leftPct: adjustTie(calcPct(M, 3, B, 3), M > B) },
     { leftLabel: 'Day',       rightLabel: 'Night',      leftPct: dnLeftPct },
-    { leftLabel: 'Straight',  rightLabel: 'Perversion', leftPct: adjustTie(calcPct(S, 1, P, 4), P >= S) },
+    { leftLabel: 'Straight',  rightLabel: 'Perversion', leftPct: adjustTie(calcPct(S, 1, P, 4), P <= S) },
   ]
 }
 
