@@ -100,7 +100,14 @@ export default function ResultPage({ searchParams }: Props) {
     <div className="space-y-6 animate-fade-in pb-12">
       {/* メインタイプ */}
       <div className="pt-6 space-y-2">
-        <p className="text-luna-gold text-xs tracking-widest text-center uppercase">診断結果</p>
+        <div className="flex items-center justify-center gap-3">
+          <p className="text-luna-gold text-xs tracking-widest uppercase">診断結果</p>
+          {isSwitcher && (
+            <span className="inline-block bg-luna-gold/20 border border-luna-gold/40 rounded-full px-3 py-0.5 text-luna-gold text-xs">
+              ⚡ スイッチャー
+            </span>
+          )}
+        </div>
         <TypeCard type={mainType} variant="main" />
         {/* Fetish タグ（メインタイプ枠と一体化） */}
         {tags.length > 0 && (
@@ -110,19 +117,6 @@ export default function ResultPage({ searchParams }: Props) {
         )}
       </div>
 
-      {/* レアリティ + スイッチャー */}
-      <div className="flex items-center justify-center gap-3 flex-wrap">
-        <p className="text-luna-muted text-sm">
-          あなたのタイプは全体の
-          <span className="text-luna-gold font-bold text-xl mx-1">{rarity}</span>
-          ％
-        </p>
-        {isSwitcher && (
-          <span className="inline-block bg-luna-gold/20 border border-luna-gold/40 rounded-full px-3 py-0.5 text-luna-gold text-xs">
-            ⚡ スイッチャー
-          </span>
-        )}
-      </div>
 
       {/* 四軸スコア */}
       {axisBars && (
