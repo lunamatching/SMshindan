@@ -44,7 +44,7 @@ export const axisQuestions: AxisQuestion[] = [
 
   // Day or Night（5問）
   { id: 'DN1', kind: 'axis', axis: 'DN', direction: 'N', text: '普通の生活と二人きりの時に見せる姿にギャップがあるほど魅力的である。' },
-  { id: 'DN2', kind: 'axis', axis: 'DN', direction: 'D', text: '朝起きた時から夜寝るまで、相手との関係を実感していたい。' },
+  { id: 'DN2', kind: 'axis', axis: 'DN', direction: 'D', text: '朝起きてから夜寝るまで、相手との関係を実感していたい。' },
   { id: 'DN3', kind: 'axis', axis: 'DN', direction: 'D', text: 'ルールを日常的に適用して、24時間意識していたい。' },
   { id: 'DN4', kind: 'axis', axis: 'DN', direction: 'D', text: '相手に「今日の服装これにして」「髪型はこれにして」など日常的な指示を出したい/出されたい。' },
   { id: 'DN5', kind: 'axis', axis: 'DN', direction: 'N', text: '二人だけの特別な時間は、決められたタイミングだけで完結してほしい。' },
