@@ -59,9 +59,27 @@ describe('calculateResult', () => {
     expect(diff).toBe(1)
   })
 
-  test('スイッチャー判定：isSwitcher は mainType[0] !== subType[0] と一致する', () => {
+  test('スイッチャー判定：LFが逆またはLFマージン<=1でisSwitcher=true', () => {
+    // allAnswers(1): L=3,F=2 → margin=1 → isSwitcher=true（条件2）
     const result = calculateResult(allAnswers(1))
-    expect(result.isSwitcher).toBe(result.mainType[0] !== result.subType[0])
+    expect(result.isSwitcher).toBe(true)
+  })
+
+  test('LF完全同点（margin=0）→ isSwitcher=true', () => {
+    const result = calculateResult({ LF1: 1, LF2: 0, LF3: 0, LF4: 1, LF5: 0 })
+    expect(result.axisMargins.LF).toBe(0)
+    expect(result.isSwitcher).toBe(true)
+  })
+
+  test('LFマージン>=2 かつサブタイプのLFも同じ → isSwitcher=false', () => {
+    // L=4,F=2 → margin=2 → LF settled, サブタイプでLF反転なし → isSwitcher=false
+    const answers: Answers = {
+      LF1: 2, LF2: 2, LF3: 0, LF4: 1, LF5: 1,
+      SP1: 2, SP3: 2, SP4: 2, SP5: 2, SP2: 0,
+    }
+    const result = calculateResult(answers)
+    expect(result.axisMargins.LF).toBe(2)
+    expect(result.isSwitcher).toBe(false)
   })
 
   test('LFマージン>=2のとき、サブタイプはLFを反転しない（スイッチャーにならない）', () => {
@@ -78,14 +96,14 @@ describe('calculateResult', () => {
     expect(result.isSwitcher).toBe(false)
   })
 
-  test('LFマージン<2のとき、スイッチャーになりうる', () => {
-    // LFが極めて拮抗しているケース（margin=1）
+  test('LFマージン=1（バー差10%）→ isSwitcher=true', () => {
+    // L=3,F=2 → margin=1 → バー差10% → 条件2でスイッチャー
     const answers: Answers = {
-      LF1: 1, LF2: 0, LF3: 0, LF4: 1, LF5: 0,  // L=1, F=1 → margin=0
+      LF1: 1, LF2: 1, LF3: 1, LF4: 1, LF5: 1,
     }
     const result = calculateResult(answers)
-    // LFがほぼ同点なので、サブタイプでLFが反転する可能性がある
-    expect(result.isSwitcher).toBe(result.mainType[0] !== result.subType[0])
+    expect(result.axisMargins.LF).toBe(1)
+    expect(result.isSwitcher).toBe(true)
   })
 
   test('rarity は 1 以上 100 以下', () => {

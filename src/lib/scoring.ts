@@ -59,7 +59,7 @@ export function calculateResult(answers: Answers): DiagnosisResult {
   // 同点時はLF > SP > MB > DNの優先順で決定論的にタイブレーク
   // LFマージンがこの値以上なら、LF軸を最後に回してスイッチャー化を抑制する
   const LF_SETTLED_THRESHOLD = 2
-  const axisPriority: Record<Axis, number> = { LF: 0, SP: 1, MB: 2, DN: 3 }
+  const axisPriority: Record<Axis, number> = { MB: 0, SP: 1, LF: 2, DN: 3 }
   const allAxesSorted = (Object.entries(axisMargins) as [Axis, number][])
     .sort((a, b) => a[1] - b[1] || axisPriority[a[0]] - axisPriority[b[0]])
   // LFが確定済みならLFを最後に回す（他軸で代替できる場合はLFを使わない）
@@ -77,7 +77,9 @@ export function calculateResult(answers: Answers): DiagnosisResult {
   }
 
   // スイッチャー判定
-  const isSwitcher = mainType[0] !== subType[0]
+  // 条件1: メインとサブでLead/Followが逆
+  // 条件2: LFバー差が10%以内（margin≤1 = Lead55/Follow45以内の接戦）
+  const isSwitcher = mainType[0] !== subType[0] || axisMargins.LF <= 1
 
   // Fetishタグ：専用設問から判定
   const fetishTags = calculateFetishTags(answers)
