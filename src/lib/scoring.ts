@@ -12,7 +12,7 @@ export interface AxisScores {
 
 export interface DiagnosisResult {
   mainType: string
-  subType: string
+  subTypes: string[]
   isSwitcher: boolean
   axisScores: AxisScores
   axisMargins: Record<Axis, number>
@@ -55,31 +55,40 @@ export function calculateResult(answers: Answers): DiagnosisResult {
     SP: Math.abs(axisScores.P - axisScores.S),
   }
 
-  // サブタイプ：マージンが小さい軸から順に反転を試み、有効なタイプが得られた最初のものを採用
-  // 同点時はLF > SP > MB > DNの優先順で決定論的にタイブレーク
-  // LFマージンがこの値以上なら、LF軸を最後に回してスイッチャー化を抑制する
+  // サブタイプ：最小マージングループ内の全有効候補を収集（同点時は複数サブタイプ表示）
+  // 優先順: MB > SP > LF > DN
+  // LFマージンがこの値以上なら確定済みとみなし、他軸で代替できる場合はLFを使わない
   const LF_SETTLED_THRESHOLD = 2
   const axisPriority: Record<Axis, number> = { MB: 0, SP: 1, LF: 2, DN: 3 }
   const allAxesSorted = (Object.entries(axisMargins) as [Axis, number][])
     .sort((a, b) => a[1] - b[1] || axisPriority[a[0]] - axisPriority[b[0]])
-  // LFが確定済みならLFを最後に回す（他軸で代替できる場合はLFを使わない）
+
   const lfSettled = axisMargins.LF >= LF_SETTLED_THRESHOLD
-  const sortedAxes = lfSettled
-    ? [...allAxesSorted.filter(([a]) => a !== 'LF'), ...allAxesSorted.filter(([a]) => a === 'LF')]
-    : allAxesSorted
-  let subType = mainType
-  for (const [axis] of sortedAxes) {
-    const candidate = flipAxis(mainType, axis, { lfWinner, mbWinner, dnWinner, spWinner })
-    if (isValidTypeCode(candidate)) {
-      subType = candidate
-      break
+  const primaryAxes = lfSettled ? allAxesSorted.filter(([a]) => a !== 'LF') : allAxesSorted
+  const lfFallbackAxes = lfSettled ? allAxesSorted.filter(([a]) => a === 'LF') : []
+
+  const collectSubTypes = (axes: [Axis, number][]): string[] => {
+    const groups = new Map<number, Axis[]>()
+    for (const [axis, margin] of axes) {
+      if (!groups.has(margin)) groups.set(margin, [])
+      groups.get(margin)!.push(axis)
     }
+    for (const margin of [...groups.keys()].sort((a, b) => a - b)) {
+      const candidates = groups.get(margin)!
+        .map(axis => flipAxis(mainType, axis, { lfWinner, mbWinner, dnWinner, spWinner }))
+        .filter(isValidTypeCode)
+      if (candidates.length > 0) return candidates
+    }
+    return []
   }
 
+  const subTypesFromPrimary = collectSubTypes(primaryAxes)
+  const subTypes = subTypesFromPrimary.length > 0 ? subTypesFromPrimary : collectSubTypes(lfFallbackAxes)
+
   // スイッチャー判定
-  // 条件1: メインとサブでLead/Followが逆
-  // 条件2: LFバー差が10%以内（margin≤1 = Lead55/Follow45以内の接戦）
-  const isSwitcher = mainType[0] !== subType[0] || axisMargins.LF <= 1
+  // 条件1: いずれかのサブタイプでLead/Followがメインと逆
+  // 条件2: LFバー差が10%以内（margin<=1 = 接戦）
+  const isSwitcher = subTypes.some(s => s[0] !== mainType[0]) || axisMargins.LF <= 1
 
   // Fetishタグ：専用設問から判定
   const fetishTags = calculateFetishTags(answers)
@@ -87,7 +96,7 @@ export function calculateResult(answers: Answers): DiagnosisResult {
   const typeData = getTypeByCode(mainType)
   const rarity = typeData?.rarity ?? 5
 
-  return { mainType, subType, isSwitcher, axisScores, axisMargins, fetishTags, rarity }
+  return { mainType, subTypes, isSwitcher, axisScores, axisMargins, fetishTags, rarity }
 }
 
 function flipAxis(

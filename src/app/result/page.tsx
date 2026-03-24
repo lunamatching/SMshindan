@@ -50,7 +50,7 @@ function parseAxisBars(as: string): AxisBar[] | null {
 }
 
 interface Props {
-  searchParams: { type?: string; sub?: string; sw?: string; tags?: string; r?: string; as?: string }
+  searchParams: { type?: string; subs?: string; sub?: string; sw?: string; tags?: string; r?: string; as?: string }
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
@@ -67,12 +67,13 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default function ResultPage({ searchParams }: Props) {
   const typeCode = searchParams.type ?? ''
-  const subCode = searchParams.sub ?? ''
+  // subs（複数）優先、後方互換としてsubも受け付ける
+  const subCodes = (searchParams.subs ?? searchParams.sub ?? '').split(',').filter(Boolean)
 
   if (!isValidTypeCode(typeCode)) notFound()
 
   const mainType = getTypeByCode(typeCode)!
-  const subType = getTypeByCode(subCode)
+  const subTypes = subCodes.map(c => getTypeByCode(c)).filter((t): t is NonNullable<typeof t> => t != null)
   const isSwitcher = searchParams.sw === '1'
   // rarity: URLパラメータを 1〜100 の整数にクランプ
   const rarityRaw = parseInt(searchParams.r ?? '5', 10)
@@ -141,10 +142,12 @@ export default function ResultPage({ searchParams }: Props) {
         </div>
       )}
 
-      {/* サブタイプ */}
-      {subType && subType.code !== mainType.code && (
+      {/* サブタイプ（複数表示対応） */}
+      {subTypes.length > 0 && (
         <div className="space-y-2">
-          <TypeCard type={subType} variant="sub" />
+          {subTypes.map(sub => (
+            <TypeCard key={sub.code} type={sub} variant="sub" />
+          ))}
         </div>
       )}
 
@@ -203,7 +206,7 @@ export default function ResultPage({ searchParams }: Props) {
       </div>
 
       {/* メールアドレス登録 */}
-      <SaveEmailForm typeCode={mainType.code} subTypeCode={subType?.code} />
+      <SaveEmailForm typeCode={mainType.code} subTypeCode={subTypes[0]?.code} />
 
       {/* Luna ロゴフッター */}
       <div className="flex flex-col items-center gap-3 pt-2">

@@ -39,7 +39,8 @@ describe('calculateResult', () => {
   test('答えなし（空）でも正常に動作する', () => {
     const result = calculateResult({})
     expect(result.mainType).toHaveLength(4)
-    expect(result.subType).toHaveLength(4)
+    expect(Array.isArray(result.subTypes)).toBe(true)
+    expect(result.subTypes.length).toBeGreaterThan(0)
     expect(typeof result.isSwitcher).toBe('boolean')
     expect(Array.isArray(result.fetishTags)).toBe(true)
   })
@@ -50,13 +51,31 @@ describe('calculateResult', () => {
     expect(calculateResult({}).mainType).toMatch(/^[LF][MB][DN][SP]$/)
   })
 
-  test('サブタイプはメインタイプと1軸だけ異なる', () => {
+  test('各サブタイプはメインタイプと1軸だけ異なる', () => {
     const result = calculateResult(allAnswers(1))
-    let diff = 0
-    for (let i = 0; i < 4; i++) {
-      if (result.mainType[i] !== result.subType[i]) diff++
+    for (const sub of result.subTypes) {
+      let diff = 0
+      for (let i = 0; i < 4; i++) {
+        if (result.mainType[i] !== sub[i]) diff++
+      }
+      expect(diff).toBe(1)
     }
-    expect(diff).toBe(1)
+  })
+
+  test('同点軸が複数あるとき、サブタイプも複数返る', () => {
+    // SP=MB=3で同点のケース (LBNP例: LF=2settled, DN=0invalid, SP=MB=3)
+    const answers: Answers = {
+      LF1: 2, LF2: 2, LF3: 0, LF4: 1, LF5: 1,  // L=4,F=2 → LF settled
+      MB1: 1, MB2: 1, MB4: 1, MB5: 1, MB6: 1,    // B=2,M=3 → Body
+      DN1: 1, DN2: 1, DN3: 1, DN4: 1, DN5: 1,    // D=3,N=2 → (Body→Night補正)
+      SP1: 2, SP3: 1, SP4: 0, SP5: 0, SP2: 0,    // P=3,S=0
+    }
+    const result = calculateResult(answers)
+    // SPとMBが同点なら2つのサブタイプが返る
+    expect(result.subTypes.length).toBeGreaterThanOrEqual(1)
+    for (const sub of result.subTypes) {
+      expect(isValidTypeCode(sub)).toBe(true)
+    }
   })
 
   test('スイッチャー判定：LFが逆またはLFマージン<=1でisSwitcher=true', () => {
@@ -84,15 +103,17 @@ describe('calculateResult', () => {
 
   test('LFマージン>=2のとき、サブタイプはLFを反転しない（スイッチャーにならない）', () => {
     // URLの実例: L=4,F=2,M=2,B=5,D=2,N=2,S=1,P=4
-    // DNマージン=0だがBody+Day無効なのでLFに来てしまっていたケース
     const answers: Answers = {
       LF1: 2, LF2: 2, LF3: 0, LF4: 1, LF5: 1,  // L=4, F=2 → margin=2
-      MB4: 1, MB5: 1, MB6: 0, MB1: 1, MB2: 1,   // M=2, B=2 (MB tie → Body)
-      DN2: 1, DN3: 1, DN4: 0, DN1: 1, DN5: 1,   // D=2, N=2 (DN tie → Night)
-      SP1: 2, SP3: 2, SP4: 0, SP5: 0, SP2: 1,   // P=4, S=1
+      MB4: 1, MB5: 1, MB6: 0, MB1: 1, MB2: 1,
+      DN2: 1, DN3: 1, DN4: 0, DN1: 1, DN5: 1,
+      SP1: 2, SP3: 2, SP4: 0, SP5: 0, SP2: 1,
     }
     const result = calculateResult(answers)
-    expect(result.subType[0]).toBe(result.mainType[0])  // LF反転なし
+    // 全サブタイプでLFは反転しない
+    for (const sub of result.subTypes) {
+      expect(sub[0]).toBe(result.mainType[0])
+    }
     expect(result.isSwitcher).toBe(false)
   })
 

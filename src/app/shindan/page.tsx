@@ -63,7 +63,7 @@ export default function ShindanPage() {
     const s = result.axisScores
     const params = new URLSearchParams({
       type: result.mainType,
-      sub: result.subType,
+      subs: result.subTypes.join(','),
       sw: result.isSwitcher ? '1' : '0',
       tags: encodeURIComponent(result.fetishTags.join(',')),
       r: String(result.rarity),
