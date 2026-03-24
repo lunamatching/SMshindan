@@ -57,9 +57,16 @@ export function calculateResult(answers: Answers): DiagnosisResult {
 
   // サブタイプ：マージンが小さい軸から順に反転を試み、有効なタイプが得られた最初のものを採用
   // 同点時はLF > SP > MB > DNの優先順で決定論的にタイブレーク
+  // LFマージンがこの値以上なら、LF軸を最後に回してスイッチャー化を抑制する
+  const LF_SETTLED_THRESHOLD = 2
   const axisPriority: Record<Axis, number> = { LF: 0, SP: 1, MB: 2, DN: 3 }
-  const sortedAxes = (Object.entries(axisMargins) as [Axis, number][])
+  const allAxesSorted = (Object.entries(axisMargins) as [Axis, number][])
     .sort((a, b) => a[1] - b[1] || axisPriority[a[0]] - axisPriority[b[0]])
+  // LFが確定済みならLFを最後に回す（他軸で代替できる場合はLFを使わない）
+  const lfSettled = axisMargins.LF >= LF_SETTLED_THRESHOLD
+  const sortedAxes = lfSettled
+    ? [...allAxesSorted.filter(([a]) => a !== 'LF'), ...allAxesSorted.filter(([a]) => a === 'LF')]
+    : allAxesSorted
   let subType = mainType
   for (const [axis] of sortedAxes) {
     const candidate = flipAxis(mainType, axis, { lfWinner, mbWinner, dnWinner, spWinner })

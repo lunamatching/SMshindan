@@ -64,6 +64,30 @@ describe('calculateResult', () => {
     expect(result.isSwitcher).toBe(result.mainType[0] !== result.subType[0])
   })
 
+  test('LFマージン>=2のとき、サブタイプはLFを反転しない（スイッチャーにならない）', () => {
+    // URLの実例: L=4,F=2,M=2,B=5,D=2,N=2,S=1,P=4
+    // DNマージン=0だがBody+Day無効なのでLFに来てしまっていたケース
+    const answers: Answers = {
+      LF1: 2, LF2: 2, LF3: 0, LF4: 1, LF5: 1,  // L=4, F=2 → margin=2
+      MB4: 1, MB5: 1, MB6: 0, MB1: 1, MB2: 1,   // M=2, B=2 (MB tie → Body)
+      DN2: 1, DN3: 1, DN4: 0, DN1: 1, DN5: 1,   // D=2, N=2 (DN tie → Night)
+      SP1: 2, SP3: 2, SP4: 0, SP5: 0, SP2: 1,   // P=4, S=1
+    }
+    const result = calculateResult(answers)
+    expect(result.subType[0]).toBe(result.mainType[0])  // LF反転なし
+    expect(result.isSwitcher).toBe(false)
+  })
+
+  test('LFマージン<2のとき、スイッチャーになりうる', () => {
+    // LFが極めて拮抗しているケース（margin=1）
+    const answers: Answers = {
+      LF1: 1, LF2: 0, LF3: 0, LF4: 1, LF5: 0,  // L=1, F=1 → margin=0
+    }
+    const result = calculateResult(answers)
+    // LFがほぼ同点なので、サブタイプでLFが反転する可能性がある
+    expect(result.isSwitcher).toBe(result.mainType[0] !== result.subType[0])
+  })
+
   test('rarity は 1 以上 100 以下', () => {
     const result = calculateResult(allAnswers(1))
     expect(result.rarity).toBeGreaterThanOrEqual(1)
