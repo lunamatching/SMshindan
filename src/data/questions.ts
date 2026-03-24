@@ -32,14 +32,13 @@ export const axisQuestions: AxisQuestion[] = [
   { id: 'LF1', kind: 'axis', axis: 'LF', direction: 'L', text: '恋愛関係では自分がリードする側になりたいと思う。' },
   { id: 'LF2', kind: 'axis', axis: 'LF', direction: 'L', text: '相手に「どうしたい？」と聞かれるより、自分から「こうして」と指示を出す方が心地いい。' },
   { id: 'LF3', kind: 'axis', axis: 'LF', direction: 'L', text: '相手の行動や反応を自分の思い通りに動かせると満足感がある。' },
-  { id: 'LF4', kind: 'axis', axis: 'LF', direction: 'F', text: '自分が命令されたり強引にされるより、相手に決めてもらう方が安心する。' },
+  { id: 'LF4', kind: 'axis', axis: 'LF', direction: 'F', text: '自分で決めるより、相手のペースに合わせる方が自然で安心する。' },
   { id: 'LF5', kind: 'axis', axis: 'LF', direction: 'F', text: '誰かに全部決めてもらって楽をしたいと思うことがよくある。' },
 
   // Mental or Body（6問）
   { id: 'MB1', kind: 'axis', axis: 'MB', direction: 'B', text: '肉体的な刺激が好き。' },
   { id: 'MB2', kind: 'axis', axis: 'MB', direction: 'B', text: '相手の「表情」「声の震え」「涙目」などに強く反応してしまう。' },
-  { id: 'MB3', kind: 'axis', axis: 'MB', direction: 'B', text: '肉体的な絶頂の瞬間が一番大事だと思う。' },
-  { id: 'MB4', kind: 'axis', axis: 'MB', direction: 'M', text: '痛みや快感そのものより、「相手を従わせている」「従っている」という状況に興奮する。' },
+{ id: 'MB4', kind: 'axis', axis: 'MB', direction: 'M', text: '痛みや快感そのものより、「相手を従わせている」「従っている」という状況に興奮する。' },
   { id: 'MB5', kind: 'axis', axis: 'MB', direction: 'M', text: '言葉責めや命令、心理的な支配・服従の方が興奮する。' },
   { id: 'MB6', kind: 'axis', axis: 'MB', direction: 'M', text: '精神的なつながりだけで十分満足できる。' },
 
@@ -52,77 +51,84 @@ export const axisQuestions: AxisQuestion[] = [
 
   // Straight or Perversion（5問）
   { id: 'SP1', kind: 'axis', axis: 'SP', direction: 'P', text: '痛みや苦痛、羞恥、特殊なシチュエーションに魅力を感じる。' },
-  { id: 'SP2', kind: 'axis', axis: 'SP', direction: 'S', text: '快楽を与える/与えられること自体が一番の目的だ。' },
+  { id: 'SP2', kind: 'axis', axis: 'SP', direction: 'S', text: '相手を気持ちよくさせる/自分が気持ちよくなること自体が一番の目的だ。' },
   { id: 'SP3', kind: 'axis', axis: 'SP', direction: 'P', text: '普通のイチャイチャより、異常なシチュエーションの方が何倍も興奮する。' },
-  { id: 'SP4', kind: 'axis', axis: 'SP', direction: 'P', text: '「泣かせる/泣かせられる」「怖がる/怖がらせる」ことに喜びを感じる。' },
+  { id: 'SP4', kind: 'axis', axis: 'SP', direction: 'P', text: '「泣かせる/泣かせられる」「怖がる/怖がらせる」「痛める/痛めつける」のどれかに喜びを感じる。' },
   { id: 'SP5', kind: 'axis', axis: 'SP', direction: 'P', text: '鞭・縄・拘束具を使うシーンを想像するとすごく興奮する。' },
 ]
 
-// ── Fetishタグ専用設問（8問）────────────────────────────────
-// モラル系は score >= 1（まあ当てはまる以上）で即時判定
+// ── Fetishタグ専用設問（9問）────────────────────────────────
+// すべて score >= 1（まあ当てはまる以上）で即時判定
 export const fetishQuestions: FetishQuestion[] = [
   // 道具系（3問）
   {
     id: 'FT1',
     kind: 'fetish',
-    text: '縄や鞭、レザーなどの道具そのものにとても興味がある。',
-    tags: ['縄', '鞭', 'レザーやラバー'],
+    text: '縄や鞭などの道具そのものにとても興味がある。',
+    tags: ['縄・鞭'],
     threshold: 1,
   },
   {
     id: 'FT2',
     kind: 'fetish',
-    text: '鞭や縄の質感、レザーやラテックスの感触に強く惹かれる。',
-    tags: ['縄', '鞭', 'レザーやラバー'],
+    text: 'レザーやラテックスの感触に強く惹かれる。',
+    tags: ['レザー・ラテックス'],
     threshold: 1,
   },
   {
     id: 'FT3',
     kind: 'fetish',
     text: '拘束具やSMグッズを見ているだけでドキドキする・買いたくなる。',
-    tags: ['手錠', 'マミー'],
+    tags: ['SMグッズ'],
     threshold: 1,
   },
   // 人体系（3問）
   {
     id: 'FT4',
     kind: 'fetish',
-    text: '足や声や汗など、つい注目してしまう人体のパーツがある。',
-    tags: ['人間の部位', '声'],
+    text: '相手の汗や唾液などに触れることを想像する。',
+    tags: ['体液'],
     threshold: 1,
   },
   {
     id: 'FT5',
     kind: 'fetish',
-    text: '相手の匂い、体液、息遣いなどに異常なほど興奮する。',
-    tags: ['匂い', '体液'],
+    text: '相手の身体の匂いに異常なほど興奮する。',
+    tags: ['匂い'],
     threshold: 1,
   },
   {
     id: 'FT6',
     kind: 'fetish',
-    text: '特定の部位（足首、手首、首筋、唇など）を舐めたり触ったりするだけで満足度がすごく高い。',
-    tags: ['人間の部位'],
+    text: '特定の身体の部位（足首、手首、首筋など）を舐めたり触ったりするだけで満足度がすごく高い。',
+    tags: ['ボディパーツ'],
     threshold: 1,
   },
-  // モラル系（2問）：まあ当てはまる以上で即時判定
+  // モラル系（3問）
   {
     id: 'FT7',
     kind: 'fetish',
     text: '性的なことを人に見られるかもしれない状況や、第三者に知られるリスクに興奮を覚える。',
-    tags: ['露出', '羞恥'],
+    tags: ['露出'],
     threshold: 1,
   },
   {
     id: 'FT8',
     kind: 'fetish',
-    text: 'パートナーが他の人と関係を持つ想像（NTR）で興奮することがある。',
+    text: 'パートナーが他の人と関係を持つ想像で興奮することがある。',
+    tags: ['NTR'],
+    threshold: 1,
+  },
+  {
+    id: 'FT9',
+    kind: 'fetish',
+    text: '自分が他の人と関係を持っている姿をパートナーに見せたいと考える。',
     tags: ['NTR'],
     threshold: 1,
   },
 ]
 
-// ── 全設問（29問）──────────────────────────────────────────
+// ── 全設問（29問：axis20 + fetish9）──────────────────────────────────────────
 export const allQuestions: Question[] = [...axisQuestions, ...fetishQuestions]
 
 export const LIKERT_OPTIONS = [

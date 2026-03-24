@@ -56,8 +56,10 @@ export function calculateResult(answers: Answers): DiagnosisResult {
   }
 
   // サブタイプ：マージンが小さい軸から順に反転を試み、有効なタイプが得られた最初のものを採用
+  // 同点時はLF > SP > MB > DNの優先順で決定論的にタイブレーク
+  const axisPriority: Record<Axis, number> = { LF: 0, SP: 1, MB: 2, DN: 3 }
   const sortedAxes = (Object.entries(axisMargins) as [Axis, number][])
-    .sort((a, b) => a[1] - b[1])
+    .sort((a, b) => a[1] - b[1] || axisPriority[a[0]] - axisPriority[b[0]])
   let subType = mainType
   for (const [axis] of sortedAxes) {
     const candidate = flipAxis(mainType, axis, { lfWinner, mbWinner, dnWinner, spWinner })
