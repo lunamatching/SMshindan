@@ -117,19 +117,22 @@ export default function ResultPage({ searchParams }: Props) {
             {axisBars.map(({ leftLabel, rightLabel, leftPct }) => (
               <div key={leftLabel} className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-luna-gold font-semibold">
+                  <span className="text-luna-text font-medium">
                     {leftLabel}
-                    <span className="text-luna-gold font-bold tabular-nums ml-1.5">{leftPct}%</span>
+                    <span className="font-bold tabular-nums ml-1.5">{leftPct}%</span>
                   </span>
-                  <span className="text-luna-muted">
-                    <span className="text-luna-muted font-bold tabular-nums mr-1.5">{100 - leftPct}%</span>
+                  <span className="text-luna-text font-medium">
+                    <span className="font-bold tabular-nums mr-1.5">{100 - leftPct}%</span>
                     {rightLabel}
                   </span>
                 </div>
-                <div className="w-full h-3 rounded-full bg-luna-border overflow-hidden">
+                <div className="w-full h-3 rounded-full overflow-hidden flex">
                   <div
-                    className="h-full rounded-full bg-gold-gradient transition-all duration-700"
+                    className="h-full bg-gold-gradient transition-all duration-700"
                     style={{ width: `${leftPct}%` }}
+                  />
+                  <div
+                    className="h-full bg-white/15 transition-all duration-700 flex-1"
                   />
                 </div>
               </div>
