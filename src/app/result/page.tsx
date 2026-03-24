@@ -93,15 +93,8 @@ export default function ResultPage({ searchParams }: Props) {
     <div className="space-y-6 animate-fade-in pb-12">
       {/* メインタイプ */}
       <div className="pt-6 space-y-2">
-        <div className="flex items-center justify-center gap-3">
-          <p className="text-luna-gold text-xs tracking-widest uppercase">診断結果</p>
-          {isSwitcher && (
-            <span className="inline-block bg-luna-gold/20 border border-luna-gold/40 rounded-full px-3 py-0.5 text-luna-gold text-xs">
-              ⚡ スイッチャー
-            </span>
-          )}
-        </div>
-        <TypeCard type={mainType} variant="main" />
+        <p className="text-luna-gold text-xs tracking-widest uppercase">診断結果</p>
+        <TypeCard type={mainType} variant="main" isSwitcher={isSwitcher} />
         {/* Fetish タグ（メインタイプ枠と一体化） */}
         {tags.length > 0 && (
           <div className="px-7 py-5 border border-t-0 border-luna-gold/30 rounded-b-2xl -mt-3 pt-6 bg-luna-card/40">

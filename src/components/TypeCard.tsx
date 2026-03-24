@@ -3,9 +3,10 @@ import { type DiagnosisType } from '@/data/types'
 interface Props {
   type: DiagnosisType
   variant?: 'main' | 'sub' | 'list'
+  isSwitcher?: boolean
 }
 
-export default function TypeCard({ type, variant = 'list' }: Props) {
+export default function TypeCard({ type, variant = 'list', isSwitcher = false }: Props) {
   const isLead = type.code.startsWith('L')
 
   if (variant === 'main') {
@@ -15,9 +16,30 @@ export default function TypeCard({ type, variant = 'list' }: Props) {
         <p className="text-luna-gold text-sm font-medium tracking-widest uppercase mb-2">{type.code}</p>
         <div className="text-6xl mb-4">{type.emoji}</div>
         <h2 className="text-4xl font-bold text-luna-text font-serif mb-3">{type.name}</h2>
-        <p className="text-luna-muted text-base leading-relaxed">{type.description}</p>
-        <div className="mt-4 inline-block bg-luna-gold/10 border border-luna-gold/30 rounded-full px-4 py-1">
-          <span className="text-luna-gold text-sm">全体の {type.rarity}%</span>
+        <p className="text-luna-gold/90 text-sm font-medium italic leading-relaxed mb-4">「{type.detail.tagline}」</p>
+        <div className="space-y-3">
+          <div>
+            <p className="text-luna-gold text-xs font-semibold tracking-wide mb-1">深層欲求</p>
+            <p className="text-luna-muted text-sm leading-relaxed">{type.detail.deepDesire}</p>
+          </div>
+          <div>
+            <p className="text-luna-gold text-xs font-semibold tracking-wide mb-1">特徴</p>
+            <p className="text-luna-muted text-sm leading-relaxed">{type.detail.features}</p>
+          </div>
+          <div>
+            <p className="text-luna-gold text-xs font-semibold tracking-wide mb-1">関係性</p>
+            <p className="text-luna-muted text-sm leading-relaxed">{type.detail.relationship}</p>
+          </div>
+        </div>
+        <div className="mt-4 flex items-center gap-2 flex-wrap">
+          <div className="inline-block bg-luna-gold/10 border border-luna-gold/30 rounded-full px-4 py-1">
+            <span className="text-luna-gold text-sm">全体の {type.rarity}%</span>
+          </div>
+          {isSwitcher && (
+            <span className="inline-block bg-luna-gold/20 border border-luna-gold/40 rounded-full px-3 py-1 text-luna-gold text-xs">
+              ⚡ スイッチャー
+            </span>
+          )}
         </div>
       </div>
     )
