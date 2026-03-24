@@ -73,7 +73,7 @@ export function calculateResult(answers: Answers): DiagnosisResult {
       if (!groups.has(margin)) groups.set(margin, [])
       groups.get(margin)!.push(axis)
     }
-    for (const margin of [...groups.keys()].sort((a, b) => a - b)) {
+    for (const margin of Array.from(groups.keys()).sort((a, b) => a - b)) {
       const candidates = groups.get(margin)!
         .map(axis => flipAxis(mainType, axis, { lfWinner, mbWinner, dnWinner, spWinner }))
         .filter(isValidTypeCode)
